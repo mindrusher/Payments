@@ -75,8 +75,8 @@ http://localhost:8000/docs
 ## Эндпоинты (POST GET)
 API-ключ: key
 
-POST /api/v1/payments
-GET /api/v1/payments/{payment_id}
+- POST /api/v1/payments
+- GET /api/v1/payments/{payment_id}
 
 ## Примеры запросов
 
