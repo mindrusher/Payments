@@ -1,0 +1,69 @@
+services:
+  db:
+    image: postgres:15
+    container_name: payments_db
+    restart: always
+    environment:
+      POSTGRES_DB: payments
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: payments_rabbit
+    restart: always
+    ports:
+      - "5672:5672"   # broker
+      - "15672:15672" # UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  api:
+    build: .
+    container_name: payments_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/payments
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+      API_KEY: key
+
+  worker:
+    build: .
+    container_name: payments_worker
+    command: python -m app.workers.consumer
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/payments
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+  
+  outbox:
+    build: .
+    container_name: payments_outbox
+    command: python -m app.workers.outbox_worker
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/payments
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+
+volumes:
+  postgres_data:
