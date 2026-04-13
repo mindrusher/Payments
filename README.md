@@ -3,7 +3,7 @@
 Микросервис для асинхронной обработки платежей с использованием паттерна Outbox, брокера сообщений RabbitMQ и вебхуков для уведомления клиентов.
 
 
-## 🏗 Архитектура
+## Архитектура
 
 Client → API Gateway (FastAPI) → PostgreSQL (Outbox) → RabbitMQ → Consumer → Webhook
 
@@ -28,7 +28,7 @@ Client → API Gateway (FastAPI) → PostgreSQL (Outbox) → RabbitMQ → Consum
 6. При ошибке вебхука - повторные попытки (3 раза с экспоненциальной задержкой)
 7. При 3 неудачных попытках - сообщение отправляется в DLQ
 
-## 🛠 Технологии
+## Технологии
 
 * FastAPI
 * SQLAlchemy 2.0
@@ -41,7 +41,7 @@ Client → API Gateway (FastAPI) → PostgreSQL (Outbox) → RabbitMQ → Consum
 
 ## Запуск
 
-### 1. Клонирование репозитория
+### Клонирование репозитория
 
 ```bash
 git clone https://github.com/mindrusher/Payments.git
