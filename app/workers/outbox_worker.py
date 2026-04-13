@@ -13,10 +13,9 @@ logger = logging.getLogger(__name__)
 
 broker = RabbitBroker(settings.rabbit_url)
 
-# создаём session factory
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
-POLL_INTERVAL = 1  # сек
+POLL_INTERVAL = 1
 
 
 async def publish_event(event: Outbox):
@@ -46,13 +45,11 @@ async def process_outbox():
                 try:
                     await publish_event(event)
 
-                    # ✅ помечаем как отправленное
                     event.status = "sent"
 
                 except Exception as e:
                     logger.error(f"Failed to publish event {event.id}: {e}")
 
-                    # увеличиваем попытки
                     event.attempts += 1
 
                     if event.attempts >= 3:

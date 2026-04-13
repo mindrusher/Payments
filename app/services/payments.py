@@ -16,7 +16,7 @@ async def create_payment(
     idempotency_key: str,
 ) -> Payment:
     """
-    Идемпотентное создание платежа с защитой от гонок
+    Идемпотентное создание платежа с защитой от race
     """
 
     result = await db.execute(

@@ -26,7 +26,6 @@ async def create_payment_endpoint(
     x_api_key: str = Header(..., alias="X-API-Key"),
     db: AsyncSession = Depends(get_db),
 ):
-    # 🔐 API Key
     if x_api_key != "key":
         raise HTTPException(status_code=403, detail="Forbidden")
 

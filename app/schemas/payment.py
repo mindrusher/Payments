@@ -7,29 +7,25 @@ from pydantic import BaseModel, Field, HttpUrl, field_validator, ConfigDict
 from enum import Enum
 
 
-# 🔹 Валюта как Enum (строгое ограничение)
 class Currency(str, Enum):
     RUB = "RUB"
     USD = "USD"
     EUR = "EUR"
 
 
-# 🔹 Статусы платежа
 class PaymentStatus(str, Enum):
     pending = "pending"
     succeeded = "succeeded"
     failed = "failed"
 
 
-# 🔹 Base schema с общими настройками
 class BaseSchema(BaseModel):
     model_config = ConfigDict(
-        from_attributes=True,  # важно для SQLAlchemy
+        from_attributes=True,
         populate_by_name=True,
     )
 
 
-# 🔹 Создание платежа (request)
 class PaymentCreate(BaseSchema):
     amount: Decimal = Field(..., gt=0, description="Payment amount")
     currency: Currency
@@ -37,7 +33,6 @@ class PaymentCreate(BaseSchema):
     metadata: Optional[Dict[str, Any]] = None
     webhook_url: HttpUrl
 
-    # 💡 Валидация decimal (2 знака после запятой)
     @field_validator("amount")
     @classmethod
     def validate_amount(cls, value: Decimal) -> Decimal:
@@ -46,14 +41,12 @@ class PaymentCreate(BaseSchema):
         return value
 
 
-# 🔹 Ответ при создании (202)
 class PaymentCreateResponse(BaseSchema):
     payment_id: UUID
     status: PaymentStatus
     created_at: datetime
 
 
-# 🔹 Полная информация о платеже
 class PaymentResponse(BaseSchema):
     id: UUID
     amount: Decimal
